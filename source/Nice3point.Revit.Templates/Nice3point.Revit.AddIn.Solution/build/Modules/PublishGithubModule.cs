@@ -18,7 +18,6 @@ namespace Build.Modules;
 /// <summary>
 ///     Publish the add-in to GitHub.
 /// </summary>
-/// <param name="buildOptions"></param>
 [SkipIfNoGitHubToken]
 [DependsOn<ResolveVersioningModule>]
 [DependsOn<GenerateGitHubChangelogModule>]
