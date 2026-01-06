@@ -1,3 +1,16 @@
+# 6.0.1
+
+Minor fixes.
+
+## Solution template
+
+- Improved package conditional directives.
+- Updated build commands in documentation.
+
+## MSBuild SDK for Revit Add-ins
+
+- Updated Nuget repository URL.
+
 # 6.0.0
 
 ## Global changes
