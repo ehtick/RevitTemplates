@@ -16,6 +16,7 @@ namespace Build.Modules;
 ///     Publish the NuGet packages to NuGet.org.
 /// </summary>
 [DependsOn<PackTemplatesModule>]
+[DependsOn<PackSdkModule>]
 [DependsOn<PublishGithubModule>]
 public sealed class PublishNugetModule(IOptions<BuildOptions> buildOptions, IOptions<NuGetOptions> nuGetOptions) : Module<CommandResult[]?>
 {
