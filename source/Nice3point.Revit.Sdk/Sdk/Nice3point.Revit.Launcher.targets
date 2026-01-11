@@ -1,0 +1,23 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <!--
+    ============================================================
+                            Launcher
+    
+    Override Revit add-ins common properties
+    
+    Additional file for Visual Studio support
+    Nice3point.Revit.Common.targets doesnt work
+    Import before Microsoft.NET.Sdk.
+    https://github.com/Nice3point/RevitTemplates/issues/111 
+    ============================================================
+    -->
+
+    <!-- Launch configuration -->
+    <PropertyGroup Condition="'$(LaunchRevit)' == 'true'">
+        <StartAction Condition="'$(StartAction)' == ''">Program</StartAction>
+        <StartProgram Condition="'$(StartProgram)' == ''">C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
+        <StartArguments Condition="'$(StartArguments)' == ''">/language ENG</StartArguments>
+    </PropertyGroup>
+
+</Project>
