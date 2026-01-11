@@ -45,6 +45,7 @@
         <TargetFramework Condition="$(RevitVersion) &gt;= '2019'">net47</TargetFramework>
         <TargetFramework Condition="$(RevitVersion) &gt;= '2021'">net48</TargetFramework>
         <TargetFramework Condition="$(RevitVersion) &gt;= '2025'">net8.0-windows7.0</TargetFramework>
+        <TargetFramework Condition="$(RevitVersion) &gt;= '2027'">net10.0-windows7.0</TargetFramework>
     </PropertyGroup>
 
 </Project>
