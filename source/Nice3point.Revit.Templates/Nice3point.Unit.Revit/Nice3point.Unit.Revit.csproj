@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Nice3point.Revit.Sdk">
 
     <PropertyGroup>
+        <EnableTUnitPolyfills>false</EnableTUnitPolyfills>
         <Configurations>Debug.R22;Debug.R23;Debug.R24;Debug.R25;Debug.R26</Configurations>
         <Configurations>$(Configurations);Release.R22;Release.R23;Release.R24;Release.R25;Release.R26</Configurations>
     </PropertyGroup>
@@ -8,8 +9,8 @@
     <ItemGroup>
         <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*"/>
         <PackageReference Include="Nice3point.TUnit.Revit" Version="$(RevitVersion).*"/>
-        <PackageReference Include="TUnit" Version="1.7.7"/>
-        <PackageReference Include="Polyfill" Version="9.5.0"/>
+        <PackageReference Include="TUnit" Version="1.9.81"/>
+        <PackageReference Include="Polyfill" Version="9.7.0"/>
     </ItemGroup>
 
 </Project>

@@ -53,10 +53,8 @@ public sealed partial class CreateBundleModule(IOptions<BundleOptions> bundleOpt
     {
         foreach (var targetDirectory in targetDirectories)
         {
-            if (!TryParseVersion(targetDirectory.Path, out var version))
-            {
-                throw new Exception($"Could not parse version from directory name: {targetDirectory.Path}");
-            }
+            TryParseVersion(configuration, out var version)
+                .ShouldBeTrue($"Could not parse version from directory name: {targetDirectory.Path}");
 
             var versionFolder = contentFolder.CreateFolder(version);
             foreach (var filePath in targetDirectory.GetFiles(file => file.Exists))
@@ -92,10 +90,8 @@ public sealed partial class CreateBundleModule(IOptions<BundleOptions> bundleOpt
 
             foreach (var targetDirectory in targetDirectories)
             {
-                if (!TryParseVersion(targetDirectory.Path, out var version))
-                {
-                    throw new Exception($"Could not parse version from directory name: {targetDirectory.Path}");
-                }
+                TryParseVersion(configuration, out var version)
+                    .ShouldBeTrue($"Could not parse version from directory name: {targetDirectory.Path}");
 
                 var addinManifests = targetDirectory.GetFiles(file => file.Extension == ".addin");
                 foreach (var addinManifest in addinManifests)
