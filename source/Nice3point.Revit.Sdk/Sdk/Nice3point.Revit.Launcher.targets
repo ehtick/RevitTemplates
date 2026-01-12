@@ -4,11 +4,10 @@
     ============================================================
                             Launcher
     
-    Override Revit add-ins common properties
+    Revit launch profile configuration
     
     Additional file for Visual Studio support
-    Nice3point.Revit.Common.targets doesnt work
-    Import before Microsoft.NET.Sdk.
+    Nice3point.Revit.Common.targets doesnt work. Import before Microsoft.NET.Sdk.
     https://github.com/Nice3point/RevitTemplates/issues/111 
     ============================================================
     -->
