@@ -1,3 +1,21 @@
+# 6.0.2
+
+## SDK
+
+- Added support for Revit 2027.
+- Fixed Visual Studio launch profile support.
+- Updated `Polyfill` to 9.7.0.
+
+## Solution template
+
+- Updated `Sourcy.DotNet` to 1.0.0.
+- Updated assertions in `CreateBundleModule`.
+
+## Revit Test (TUnit) template
+
+- Updated `TUnit` to 1.9.81.
+- Added `EnableTUnitPolyfills` property.
+
 # 6.0.1
 
 Minor fixes.
@@ -53,6 +71,7 @@ Minor fixes.
 An updated .csproj looks like this:
 
 ```msbuild
+
 <Project Sdk="Nice3point.Revit.Sdk/6.0.0">
 
     <PropertyGroup>
