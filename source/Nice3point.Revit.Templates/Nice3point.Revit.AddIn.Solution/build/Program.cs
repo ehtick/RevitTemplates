@@ -2,49 +2,45 @@
 using Build.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ModularPipelines;
 using ModularPipelines.Extensions;
-using ModularPipelines.Host;
 
-await PipelineHostBuilder.Create()
-    .ConfigureAppConfiguration((context, builder) =>
-    {
-        builder.AddJsonFile("appsettings.json")
-            .AddEnvironmentVariables();
-    })
-    .ConfigureServices((context, collection) =>
-    {
-        collection.AddOptions<BuildOptions>().Bind(context.Configuration.GetSection("Build")).ValidateDataAnnotations();
+var builder = Pipeline.CreateBuilder();
 
-        collection.AddModule<ResolveConfigurationsModule>();
-        collection.AddModule<ResolveVersioningModule>();
-        collection.AddModule<CleanProjectModule>();
-        collection.AddModule<CompileProjectModule>();
+builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration.AddUserSecrets<Program>();
+builder.Configuration.AddEnvironmentVariables();
 #if (hasArtifacts)
 
-        if (args.Contains("pack"))
-        {
-#if (includeBundle)
-            collection.AddOptions<BundleOptions>().Bind(context.Configuration.GetSection("Bundle")).ValidateDataAnnotations();
-
-#endif
-#if (includeBundle)
-            collection.AddModule<CreateBundleModule>();
-#endif
-#if (includeInstaller)
-            collection.AddModule<CreateInstallerModule>();
-#endif
-        }
+builder.Services.AddOptions<BuildOptions>().Bind(builder.Configuration.GetSection("Build"));
+builder.Services.AddOptions<BundleOptions>().Bind(builder.Configuration.GetSection("Bundle"));
 #endif
 #if (isGitHubCi && hasArtifacts)
-
-        if (args.Contains("publish"))
-        {
-            collection.AddOptions<PublishOptions>().Bind(context.Configuration.GetSection("Publish")).ValidateDataAnnotations();
-
-            collection.AddModule<GenerateChangelogModule>();
-            collection.AddModule<GenerateGitHubChangelogModule>();
-            collection.AddModule<PublishGithubModule>();
-        }
+builder.Services.AddOptions<PublishOptions>().Bind(builder.Configuration.GetSection("Publish"));
 #endif
-    })
-    .ExecutePipelineAsync();
+
+if (args.Length == 0)
+{
+    builder.Services.AddModule<CompileProjectsModule>();
+}
+#if (hasArtifacts)
+
+if (args.Contains("pack"))
+{
+    builder.Services.AddModule<CleanProjectsModule>();
+#if (includeBundle)
+    builder.Services..AddModule<CreateBundleModule>();
+#endif
+#if (includeInstaller)
+    builder.Services..AddModule<CreateInstallerModule>();
+#endif
+}
+#endif
+#if (isGitHubCi && hasArtifacts)
+if (args.Contains("publish"))
+{
+    builder.Services.AddModule<PublishGithubModule>();
+}
+#endif
+
+await builder.Build().RunAsync();

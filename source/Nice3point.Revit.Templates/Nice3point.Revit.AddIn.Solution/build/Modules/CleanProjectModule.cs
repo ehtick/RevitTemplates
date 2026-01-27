@@ -1,6 +1,9 @@
-﻿using Build.Attributes;
+﻿#if (hasArtifacts)
 using Build.Options;
+#endif
 using Microsoft.Extensions.Options;
+using ModularPipelines.Attributes;
+using ModularPipelines.Conditions;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
 using ModularPipelines.Modules;
@@ -11,14 +14,14 @@ namespace Build.Modules;
 /// <summary>
 ///     Clean projects and artifact directories.
 /// </summary>
-[SkipIfContinuousIntegrationBuild]
+[SkipIf<IsCI>]
 #if (hasArtifacts)
 public sealed class CleanProjectModule(IOptions<BuildOptions> buildOptions) : Module
 #else
 public sealed class CleanProjectModule() : Module
 #endif
 {
-    protected override async Task<IDictionary<string, object>?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override void ExecuteModule(IModuleContext context, CancellationToken cancellationToken)
     {
         var rootDirectory = context.Git().RootDirectory;
 #if (hasArtifacts)
@@ -39,7 +42,5 @@ public sealed class CleanProjectModule() : Module
             outputDirectory.Clean();
         }
 #endif
-
-        return await NothingAsync();
     }
 }

@@ -43,4 +43,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTNET_ENVIRONMENT: ${{ (github.ref_name == 'main' || github.ref_type == 'tag') && 'Production' || 'Development' }}
-          Build__Version: ${{ inputs.version || (github.ref_type == 'tag' && github.ref_name || '') }}
+          Publish__Version: ${{ inputs.version || (github.ref_type == 'tag' && github.ref_name || '') }}

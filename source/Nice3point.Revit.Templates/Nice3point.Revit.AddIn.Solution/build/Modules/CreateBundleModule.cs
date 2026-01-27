@@ -7,7 +7,6 @@ using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.FileSystem;
 using ModularPipelines.Git.Extensions;
-using ModularPipelines.Models;
 using ModularPipelines.Modules;
 using Shouldly;
 using Sourcy.DotNet;
@@ -20,12 +19,12 @@ namespace Build.Modules;
 /// </summary>
 [DependsOn<ResolveVersioningModule>]
 [DependsOn<CompileProjectModule>]
-public sealed partial class CreateBundleModule(IOptions<BundleOptions> bundleOptions) : Module<CommandResult>
+public sealed partial class CreateBundleModule(IOptions<BundleOptions> bundleOptions) : Module
 {
-    protected override async Task<CommandResult?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveVersioningModule>();
-        var versioning = versioningResult.Value!;
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var versioning = versioningResult.ValueOrDefault!;
 
         var bundleTarget = new File(Projects.Nice3point.Revit.AddIn.FullName);
         var targetDirectories = bundleTarget.Folder!
@@ -43,17 +42,15 @@ public sealed partial class CreateBundleModule(IOptions<BundleOptions> bundleOpt
         PackFiles(targetDirectories, contentFolder);
         GenerateManifest(bundleTarget, targetDirectories, manifestFile, versioning);
 
-        context.Zip.ZipFolder(bundleFolder, outputFolder.GetFile($"{bundleFolder.Name}.zip").Path);
-        bundleFolder.Delete();
-
-        return await NothingAsync();
+        context.Files.Zip.ZipFolder(bundleFolder, outputFolder.GetFile($"{bundleFolder.Name}.zip").Path);
+        await bundleFolder.DeleteAsync(cancellationToken);
     }
 
     private static void PackFiles(Folder[] targetDirectories, Folder contentFolder)
     {
         foreach (var targetDirectory in targetDirectories)
         {
-            TryParseVersion(configuration, out var version)
+            TryParseVersion(targetDirectory.Path, out var version)
                 .ShouldBeTrue($"Could not parse version from directory name: {targetDirectory.Path}");
 
             var versionFolder = contentFolder.CreateFolder(version);
@@ -90,7 +87,7 @@ public sealed partial class CreateBundleModule(IOptions<BundleOptions> bundleOpt
 
             foreach (var targetDirectory in targetDirectories)
             {
-                TryParseVersion(configuration, out var version)
+                TryParseVersion(targetDirectory.Path, out var version)
                     .ShouldBeTrue($"Could not parse version from directory name: {targetDirectory.Path}");
 
                 var addinManifests = targetDirectory.GetFiles(file => file.Extension == ".addin");

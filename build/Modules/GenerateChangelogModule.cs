@@ -14,11 +14,11 @@ namespace Build.Modules;
 [DependsOn<ResolveVersioningModule>]
 public sealed class GenerateChangelogModule : Module<string>
 {
-    protected override async Task<string?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task<string?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveVersioningModule>();
-        var versioning = versioningResult.Value!;
-        
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var versioning = versioningResult.ValueOrDefault!;
+
         var changelogFile = context.Git().RootDirectory.GetFile("Changelog.md");
 
         var changelog = await ParseChangelog(changelogFile, versioning.Version);
@@ -37,7 +37,7 @@ public sealed class GenerateChangelogModule : Module<string>
         var isChangelogEntryFound = false;
         var changelog = new StringBuilder();
 
-        foreach (var line in await changelogFile.ReadLinesAsync())
+        await foreach (var line in changelogFile.ReadLinesAsync())
         {
             if (isChangelogEntryFound)
             {

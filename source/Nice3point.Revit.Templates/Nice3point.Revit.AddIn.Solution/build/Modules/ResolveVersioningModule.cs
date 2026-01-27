@@ -1,21 +1,21 @@
 using Build.Options;
 using Microsoft.Extensions.Options;
 using ModularPipelines.Context;
-using ModularPipelines.Enums;
 using ModularPipelines.Git.Extensions;
 using ModularPipelines.Git.Options;
 using ModularPipelines.Modules;
+using ModularPipelines.Options;
 
 namespace Build.Modules;
 
 /// <summary>
 ///     Resolve semantic versions for compiling and publishing the add-in.
 /// </summary>
-public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions) : Module<ResolveVersioningResult>
+public sealed class ResolveVersioningModule(IOptions<PublishOptions> publishOptions) : Module<ResolveVersioningResult>
 {
-    protected override async Task<ResolveVersioningResult?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task<ResolveVersioningResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var version = buildOptions.Value.Version;
+        var version = publishOptions.Value.Version;
         if (!string.IsNullOrEmpty(version))
         {
             return await CreateFromVersionStringAsync(context, version);
@@ -27,7 +27,7 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
     /// <summary>
     ///     Resolve versions using the specified version string.
     /// </summary>
-    private static async Task<ResolveVersioningResult> CreateFromVersionStringAsync(IPipelineContext context, string version)
+    private static async Task<ResolveVersioningResult> CreateFromVersionStringAsync(IModuleContext context, string version)
     {
         var versionParts = version.Split('-');
 
@@ -44,7 +44,7 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
     /// <summary>
     ///     Resolve versions using the GitVersion Tool.
     /// </summary>
-    private static async Task<ResolveVersioningResult> CreateFromGitVersioningAsync(IPipelineContext context)
+    private static async Task<ResolveVersioningResult> CreateFromGitVersioningAsync(IModuleContext context)
     {
         var gitVersioning = await context.Git().Versioning.GetGitVersioningInformation();
 
@@ -61,29 +61,37 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
     /// <summary>
     ///     Retrieves the previous version from the git history.
     /// </summary>
-    private static async Task<string> FetchPreviousVersionAsync(IPipelineContext context)
+    private static async Task<string> FetchPreviousVersionAsync(IModuleContext context)
     {
-        var describeResult = await context.Git().Commands.Describe(new GitDescribeOptions
-        {
-            Tags = true,
-            Abbrev = "0",
-            Arguments = ["HEAD^"],
-            ThrowOnNonZeroExitCode = false,
-            CommandLogging = CommandLogging.None
-        });
+        var describeResult = await context.Git().Commands.Describe(
+            new GitDescribeOptions
+            {
+                Tags = true,
+                Abbrev = "0",
+                Arguments = ["HEAD^"],
+            },
+            new CommandExecutionOptions
+            {
+                ThrowOnNonZeroExitCode = false,
+                LogSettings = CommandLoggingOptions.Silent
+            });
 
         var previousTag = describeResult.StandardOutput.Trim();
         if (!string.IsNullOrWhiteSpace(previousTag)) return previousTag;
 
-        var revisionResult = await context.Git().Commands.RevList(new GitRevListOptions
-        {
-            MaxParents = "0",
-            MaxCount = "1",
-            Pretty = "format:%H",
-            Arguments = ["HEAD"],
-            NoCommitHeader = true,
-            CommandLogging = CommandLogging.None
-        });
+        var revisionResult = await context.Git().Commands.RevList(
+            new GitRevListOptions
+            {
+                MaxParents = "0",
+                MaxCount = "1",
+                Pretty = "format:%H",
+                Arguments = ["HEAD"],
+                NoCommitHeader = true,
+            },
+            new CommandExecutionOptions
+            {
+                LogSettings = CommandLoggingOptions.Silent
+            });
 
         return revisionResult.StandardOutput.Trim();
     }

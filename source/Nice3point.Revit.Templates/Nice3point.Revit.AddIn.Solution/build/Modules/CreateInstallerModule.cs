@@ -19,9 +19,9 @@ namespace Build.Modules;
 /// </summary>
 [DependsOn<ResolveVersioningModule>]
 [DependsOn<CompileProjectModule>]
-public sealed class CreateInstallerModule : Module<CommandResult>
+public sealed class CreateInstallerModule : Module
 {
-    protected override async Task<CommandResult?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var versioningResult = await GetModule<ResolveVersioningModule>();
         var versioning = versioningResult.Value!;
@@ -33,7 +33,7 @@ public sealed class CreateInstallerModule : Module<CommandResult>
         await context.DotNet().Build(new DotNetBuildOptions
         {
             ProjectSolution = wixInstaller.Path,
-            Configuration = Configuration.Release,
+            Configuration = "Release",
             Properties =
             [
                 ("Version", versioning.Version)
@@ -54,40 +54,31 @@ public sealed class CreateInstallerModule : Module<CommandResult>
 
         targetDirectories.ShouldNotBeEmpty("No content were found to create an installer");
 
-        return await context.Command.ExecuteCommandLineTool(new CommandLineToolOptions(builderFile.Path)
-        {
-            Arguments = targetDirectories,
-            WorkingDirectory = context.Git().RootDirectory,
-            CommandLogging = CommandLogging.Default & ~CommandLogging.Input,
-            EnvironmentVariables = new Dictionary<string, string?>
+        await context.Shell.Command.ExecuteCommandLineTool(
+            new GenericCommandLineToolOptions(builderFile.Path)
             {
-                { "PATH", $"{Environment.GetEnvironmentVariable("PATH")};{wixToolFolder}" }
-            }
-        }, cancellationToken);
+                Arguments = targetDirectories,
+            },
+            new CommandExecutionOptions
+            {
+                WorkingDirectory = context.Git().RootDirectory,
+                EnvironmentVariables = new Dictionary<string, string?>
+                {
+                    {"PATH", $"{Environment.GetEnvironmentVariable("PATH")};{wixToolFolder}"}
+                }
+            }, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     ///     Installs the WiX toolset required for building installers.
     /// </summary>
-    private static async Task<Folder> InstallWixAsync(IPipelineContext context, CancellationToken cancellationToken)
+    private static async Task<Folder> InstallWixAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var wixToolFolder = context.FileSystem.CreateTemporaryFolder();
-#if (_needToUpdatePipelineVersion)
-        await context.DotNet().Tool.Install(new DotNetToolInstallOptions("wix")
+        var wixToolFolder = Folder.CreateTemporaryFolder();
+        await context.DotNet().Tool.Execute(new DotNetToolOptions
         {
-            ToolPath = wixToolFolder.Path
-        }, cancellationToken);
-#endif
-        await context.Command.ExecuteCommandLineTool(new CommandLineToolOptions("dotnet")
-        {
-            Arguments =
-            [
-                "tool",
-                "install",
-                "--tool-path", wixToolFolder.Path,
-                "wix"
-            ]
-        }, cancellationToken);
+            Arguments = ["install", "wix", "--tool-path", wixToolFolder.Path]
+        }, cancellationToken: cancellationToken);
 
         return wixToolFolder;
     }

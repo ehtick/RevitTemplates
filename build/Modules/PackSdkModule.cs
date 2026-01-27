@@ -14,31 +14,33 @@ namespace Build.Modules;
 /// <summary>
 ///     Pack the SDK NuGet package.
 /// </summary>
-[DependsOn<CleanProjectModule>]
+[DependsOn<CleanProjectsModule>]
 [DependsOn<ResolveVersioningModule>]
-[DependsOn<GenerateNugetChangelogModule>]
-public sealed class PackSdkModule(IOptions<BuildOptions> buildOptions) : Module<CommandResult>
+[DependsOn<UpdateTemplatesReadmeModule>(Optional = true)]
+[DependsOn<CleanProjectsModule>(Optional = true)]
+[DependsOn<GenerateNugetChangelogModule>(Optional = true)]
+public sealed class PackSdkModule(IOptions<BuildOptions> buildOptions) : Module
 {
-    protected override async Task<CommandResult?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveVersioningModule>();
-        var changelogResult = await GetModule<GenerateNugetChangelogModule>();
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var changelogResult = await context.GetModule<GenerateNugetChangelogModule>();
 
-        var versioning = versioningResult.Value!;
-        var changelog = changelogResult.Value ?? string.Empty;
+        var versioning = versioningResult.ValueOrDefault!;
+        var changelog = changelogResult.ValueOrDefault ?? string.Empty;
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
 
-        return await context.DotNet().Pack(new DotNetPackOptions
+        await context.DotNet().Pack(new DotNetPackOptions
         {
             ProjectSolution = Projects.Nice3point_Revit_Sdk.FullName,
-            Configuration = Configuration.Release,
+            Configuration = "Release",
+            Output = outputFolder,
             Properties = new List<KeyValue>
             {
                 ("VersionPrefix", versioning.VersionPrefix),
                 ("VersionSuffix", versioning.VersionSuffix!),
                 ("PackageReleaseNotes", changelog)
-            },
-            OutputDirectory = outputFolder
-        }, cancellationToken);
+            }
+        }, cancellationToken: cancellationToken);
     }
 }
