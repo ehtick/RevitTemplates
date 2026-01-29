@@ -1,7 +1,7 @@
 ﻿#if (hasArtifacts)
 using Build.Options;
-#endif
 using Microsoft.Extensions.Options;
+#endif
 using ModularPipelines.Attributes;
 using ModularPipelines.Conditions;
 using ModularPipelines.Context;
@@ -18,7 +18,7 @@ namespace Build.Modules;
 #if (hasArtifacts)
 public sealed class CleanProjectModule(IOptions<BuildOptions> buildOptions) : Module
 #else
-public sealed class CleanProjectModule() : Module
+public sealed class CleanProjectModule : SyncModule
 #endif
 {
     protected override void ExecuteModule(IModuleContext context, CancellationToken cancellationToken)

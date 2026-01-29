@@ -11,11 +11,11 @@ namespace Build.Modules;
 /// <summary>
 ///     Resolve semantic versions for compiling and publishing the add-in.
 /// </summary>
-public sealed class ResolveVersioningModule(IOptions<PublishOptions> publishOptions) : Module<ResolveVersioningResult>
+public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions) : Module<ResolveVersioningResult>
 {
     protected override async Task<ResolveVersioningResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var version = publishOptions.Value.Version;
+        var version = buildOptions.Value.Version;
         if (!string.IsNullOrEmpty(version))
         {
             return await CreateFromVersionStringAsync(context, version);

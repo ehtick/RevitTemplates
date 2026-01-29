@@ -10,9 +10,9 @@ var builder = Pipeline.CreateBuilder();
 builder.Configuration.AddJsonFile("appsettings.json");
 builder.Configuration.AddUserSecrets<Program>();
 builder.Configuration.AddEnvironmentVariables();
-#if (hasArtifacts)
 
 builder.Services.AddOptions<BuildOptions>().Bind(builder.Configuration.GetSection("Build"));
+#if (hasArtifacts)
 builder.Services.AddOptions<BundleOptions>().Bind(builder.Configuration.GetSection("Bundle"));
 #endif
 #if (isGitHubCi && hasArtifacts)
@@ -21,13 +21,13 @@ builder.Services.AddOptions<PublishOptions>().Bind(builder.Configuration.GetSect
 
 if (args.Length == 0)
 {
-    builder.Services.AddModule<CompileProjectsModule>();
+    builder.Services.AddModule<CompileProjectModule>();
 }
 #if (hasArtifacts)
 
 if (args.Contains("pack"))
 {
-    builder.Services.AddModule<CleanProjectsModule>();
+    builder.Services.AddModule<CleanProjectModule>();
 #if (includeBundle)
     builder.Services..AddModule<CreateBundleModule>();
 #endif

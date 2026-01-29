@@ -28,7 +28,7 @@ namespace Build.Modules;
 #endif
 public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : Module
 {
-    protected override void ExecuteModule(IModuleContext context, CancellationToken cancellationToken)
+    protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var versioningResult = await context.GetModule<ResolveVersioningModule>();
         var changelogResult = await context.GetModule<GenerateGitHubChangelogModule>();

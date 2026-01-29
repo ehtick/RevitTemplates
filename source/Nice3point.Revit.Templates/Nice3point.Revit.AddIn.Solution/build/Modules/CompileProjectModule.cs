@@ -15,7 +15,7 @@ namespace Build.Modules;
 [DependsOn<ResolveConfigurationsModule>]
 public sealed class CompileProjectModule : Module
 {
-    protected override void ExecuteModule(IModuleContext context, CancellationToken cancellationToken)
+    protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var versioningResult = await context.GetModule<ResolveVersioningModule>();
         var configurationsResult = await context.GetModule<ResolveConfigurationsModule>();
