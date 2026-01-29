@@ -25,11 +25,13 @@ public sealed class PackTemplatesModule(IOptions<BuildOptions> buildOptions) : M
 {
     protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
+        var changelogModule = context.GetModuleIfRegistered<GenerateNugetChangelogModule>();
+
         var versioningResult = await context.GetModule<ResolveVersioningModule>();
-        var changelogResult = await context.GetModule<GenerateNugetChangelogModule>();
+        var changelogResult = changelogModule is null ? null : await changelogModule;
 
         var versioning = versioningResult.ValueOrDefault!;
-        var changelog = changelogResult.ValueOrDefault ?? string.Empty;
+        var changelog = changelogResult?.ValueOrDefault ?? string.Empty;
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
 
         List<string> updatedFiles = [];
