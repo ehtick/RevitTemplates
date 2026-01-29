@@ -53,6 +53,9 @@
         <!-- Build -->
         <PackageReference Include="ILRepack" Version="2.0.44"/>
 <!--#endif-->
+
+        <!-- Development References -->
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" PrivateAssets="all"/>
     </ItemGroup>
     
 <!--#if (isApplicationAddin)-->
