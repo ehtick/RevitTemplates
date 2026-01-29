@@ -31,11 +31,7 @@ public sealed class CreateInstallerModule : Module
         await context.DotNet().Build(new DotNetBuildOptions
         {
             ProjectSolution = wixInstaller.Path,
-            Configuration = "Release",
-            Properties =
-            [
-                ("Version", versioning.Version)
-            ]
+            Configuration = "Release"
         }, cancellationToken: cancellationToken);
 
         var builderFile = wixInstaller.Folder!
@@ -55,7 +51,7 @@ public sealed class CreateInstallerModule : Module
         await context.Shell.Command.ExecuteCommandLineTool(
             new GenericCommandLineToolOptions(builderFile.Path)
             {
-                Arguments = targetDirectories,
+                Arguments = [versioning.Version, ..targetDirectories]
             },
             new CommandExecutionOptions
             {

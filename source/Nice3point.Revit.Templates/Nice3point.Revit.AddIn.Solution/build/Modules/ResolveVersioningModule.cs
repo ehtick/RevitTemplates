@@ -106,9 +106,9 @@ public sealed record ResolveVersioningResult
     /// </summary>
     /// <remarks>Version format: <c>version-environment.n.date</c>.</remarks>
     /// <example>
-    ///     1.0.0-alpha.1.250101 <br/>
-    ///     1.0.0-beta.2.250101 <br/>
-    ///     1.0.0
+    ///     1.0.0-alpha.1 <br/>
+    ///     12.3.6-rc.2.250101 <br/>
+    ///     2026.4.0
     /// </example>
     public required string Version { get; init; }
 
