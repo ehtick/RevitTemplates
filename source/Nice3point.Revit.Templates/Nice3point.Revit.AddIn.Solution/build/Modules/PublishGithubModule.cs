@@ -36,8 +36,10 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
         var changelog = changelogResult.ValueOrDefault!;
 
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
+#if (hasArtifacts)
         var targetFiles = outputFolder.ListFiles().ToArray();
         targetFiles.ShouldNotBeEmpty("No artifacts were found to create the Release");
+#endif
 
         var repositoryInfo = context.GitHub().RepositoryInfo;
         var newRelease = new NewRelease(versioning.Version)
@@ -49,6 +51,7 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
         };
 
         var release = await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
+#if (hasArtifacts)
         await targetFiles
             .ForEachAsync(async file =>
             {
@@ -64,6 +67,7 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
                 await context.GitHub().Client.Repository.Release.UploadAsset(release, asset, cancellationToken);
             }, cancellationToken)
             .ProcessInParallel();
+#endif
     }
 
     protected override async Task OnFailedAsync(IModuleContext context, Exception exception, CancellationToken cancellationToken)

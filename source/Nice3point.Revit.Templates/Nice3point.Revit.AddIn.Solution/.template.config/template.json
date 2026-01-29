@@ -117,17 +117,6 @@
           ]
         },
         {
-          "condition": "isGitHubCi && !hasArtifacts",
-          "exclude": [
-            ".github/workflows/PublishRelease.yml",
-            "Changelog.md",
-            "build/Modules/GenerateChangelogModule.cs",
-            "build/Modules/GenerateGitHubChangelogModule.cs",
-            "build/Modules/PublishGithubModule.cs",
-            "build/Options/PublishOptions.cs"
-          ]
-        },
-        {
           "condition": "!includeInstaller",
           "exclude": [
             "install/**",

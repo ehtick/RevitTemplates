@@ -15,7 +15,7 @@ builder.Services.AddOptions<BuildOptions>().Bind(builder.Configuration.GetSectio
 #if (hasArtifacts)
 builder.Services.AddOptions<BundleOptions>().Bind(builder.Configuration.GetSection("Bundle"));
 #endif
-#if (isGitHubCi && hasArtifacts)
+#if (isGitHubCi)
 builder.Services.AddOptions<PublishOptions>().Bind(builder.Configuration.GetSection("Publish"));
 #endif
 
@@ -36,7 +36,7 @@ if (args.Contains("pack"))
 #endif
 }
 #endif
-#if (isGitHubCi && hasArtifacts)
+#if (isGitHubCi)
 if (args.Contains("publish"))
 {
     builder.Services.AddModule<PublishGithubModule>();

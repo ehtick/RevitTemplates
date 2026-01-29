@@ -16,7 +16,7 @@ Autodesk Revit plugin project organized into multiple solution files that target
 ---#elseif (includeBundle)
   * [Building the Autodesk bundle on local machine](#building-the-autodesk-bundle-on-local-machine)
 ---#endif
----#if (isReleaseCi && hasArtifacts)
+---#if (isReleaseCi)
 * [Publishing Releases](#publishing-releases)
   * [Creating a new Release from the JetBrains Rider](#creating-a-new-release-from-the-jetbrains-rider)
   * [Creating a new Release from the Terminal](#creating-a-new-release-from-the-terminal)
@@ -129,9 +129,9 @@ To execute your ModularPipelines build locally, you can follow these steps:
 ---#endif
    This command will execute the ModularPipelines build defined in your project.
 ---#endif
----#if (isReleaseCi && hasArtifacts)
-
+---#if (isReleaseCi)
 ## Publishing Releases
+---#endif
 
 Releases are managed by creating new [Git tags](https://git-scm.com/book/en/v2/Git-Basics-Tagging).
 A tag in Git used to capture a snapshot of the project at a particular point in time, with the ability to roll back to a previous version.
