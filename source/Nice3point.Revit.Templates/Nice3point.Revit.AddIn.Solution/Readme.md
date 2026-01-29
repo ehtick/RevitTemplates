@@ -130,6 +130,7 @@ To execute your ModularPipelines build locally, you can follow these steps:
    This command will execute the ModularPipelines build defined in your project.
 ---#endif
 ---#if (isReleaseCi)
+
 ## Publishing Releases
 
 Releases are managed by creating new [Git tags](https://git-scm.com/book/en/v2/Git-Basics-Tagging).
@@ -229,9 +230,9 @@ To create releases directly on GitHub:
 5. Click **Run**.
 
     ![image](https://github.com/user-attachments/assets/088388c1-6055-4d21-8d22-70f047d8f104)
-
 ---#endif
 ---#if (isAzureCi)
+
 ### Creating a new Release on Azure DevOps
 
 To create releases directly on Azure:

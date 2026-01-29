@@ -16,7 +16,7 @@ namespace Build.Modules;
 /// </summary>
 [SkipIf<IsCI>]
 #if (hasArtifacts)
-public sealed class CleanProjectModule(IOptions<BuildOptions> buildOptions) : Module
+public sealed class CleanProjectModule(IOptions<BuildOptions> buildOptions) : SyncModule
 #else
 public sealed class CleanProjectModule : SyncModule
 #endif

@@ -1,7 +1,9 @@
-﻿using Build.Options;
+﻿#if (hasArtifacts)
+using Build.Options;
 using EnumerableAsyncProcessor.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+#endif
 using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
@@ -10,7 +12,9 @@ using ModularPipelines.GitHub.Attributes;
 using ModularPipelines.GitHub.Extensions;
 using ModularPipelines.Modules;
 using Octokit;
+#if (hasArtifacts)
 using Shouldly;
+#endif
 
 namespace Build.Modules;
 
@@ -26,7 +30,11 @@ namespace Build.Modules;
 #if (includeInstaller)
 [DependsOn<CreateInstallerModule>(Optional = true)]
 #endif
+#if (hasArtifacts)
 public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : Module
+#else
+public sealed class PublishGithubModule : Module
+#endif
 {
     protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
@@ -34,9 +42,9 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
         var changelogResult = await context.GetModule<GenerateGitHubChangelogModule>();
         var versioning = versioningResult.ValueOrDefault!;
         var changelog = changelogResult.ValueOrDefault!;
+#if (hasArtifacts)
 
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
-#if (hasArtifacts)
         var targetFiles = outputFolder.ListFiles().ToArray();
         targetFiles.ShouldNotBeEmpty("No artifacts were found to create the Release");
 #endif
@@ -50,8 +58,8 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
             Prerelease = versioning.IsPrerelease
         };
 
-        var release = await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
 #if (hasArtifacts)
+        var release = await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
         await targetFiles
             .ForEachAsync(async file =>
             {
@@ -67,6 +75,8 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
                 await context.GitHub().Client.Repository.Release.UploadAsset(release, asset, cancellationToken);
             }, cancellationToken)
             .ProcessInParallel();
+#else
+        await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
 #endif
     }
 

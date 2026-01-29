@@ -1,4 +1,5 @@
 using Build.Options;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
@@ -97,6 +98,7 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
     }
 }
 
+[PublicAPI]
 public sealed record ResolveVersioningResult
 {
     /// <summary>

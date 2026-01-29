@@ -20,7 +20,7 @@ public sealed class GenerateGitHubChangelogModule : Module<string>
         var versioning = versioningResult.ValueOrDefault!;
         var changelog = changelogResult.ValueOrDefault!;
 
-        return AppendExtraUrls(context, changelog, versioning);
+        return AppendGitHubCompareUrl(context, changelog, versioning);
     }
 
     /// <summary>

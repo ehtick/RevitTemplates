@@ -12,7 +12,7 @@ builder.Configuration.AddUserSecrets<Program>();
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddOptions<BuildOptions>().Bind(builder.Configuration.GetSection("Build"));
-#if (hasArtifacts)
+#if (includeBundle)
 builder.Services.AddOptions<BundleOptions>().Bind(builder.Configuration.GetSection("Bundle"));
 #endif
 #if (isGitHubCi)
@@ -29,10 +29,10 @@ if (args.Contains("pack"))
 {
     builder.Services.AddModule<CleanProjectModule>();
 #if (includeBundle)
-    builder.Services..AddModule<CreateBundleModule>();
+    builder.Services.AddModule<CreateBundleModule>();
 #endif
 #if (includeInstaller)
-    builder.Services..AddModule<CreateInstallerModule>();
+    builder.Services.AddModule<CreateInstallerModule>();
 #endif
 }
 #endif

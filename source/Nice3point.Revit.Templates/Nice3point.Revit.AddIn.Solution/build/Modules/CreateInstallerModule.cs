@@ -2,10 +2,8 @@
 using ModularPipelines.Context;
 using ModularPipelines.DotNet.Extensions;
 using ModularPipelines.DotNet.Options;
-using ModularPipelines.Enums;
 using ModularPipelines.FileSystem;
 using ModularPipelines.Git.Extensions;
-using ModularPipelines.Models;
 using ModularPipelines.Modules;
 using ModularPipelines.Options;
 using Shouldly;
@@ -23,8 +21,8 @@ public sealed class CreateInstallerModule : Module
 {
     protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveVersioningModule>();
-        var versioning = versioningResult.Value!;
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var versioning = versioningResult.ValueOrDefault!;
 
         var wixTarget = new File(Projects.Nice3point.Revit.AddIn.FullName);
         var wixInstaller = new File(Projects.Installer.FullName);
@@ -38,7 +36,7 @@ public sealed class CreateInstallerModule : Module
             [
                 ("Version", versioning.Version)
             ]
-        }, cancellationToken);
+        }, cancellationToken: cancellationToken);
 
         var builderFile = wixInstaller.Folder!
             .GetFolder("bin")
