@@ -1,7 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-    <Import Project="Nice3point.Revit.Common.props"/>
     <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk"/>
+    <Import Project="Nice3point.Revit.Common.props"/>
 
     <PropertyGroup>
         <BuildTasksDirectoryRoot>$(MSBuildThisFileDirectory)..\tasks\</BuildTasksDirectoryRoot>
