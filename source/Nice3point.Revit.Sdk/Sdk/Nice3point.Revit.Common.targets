@@ -9,7 +9,7 @@
     -->
 
     <!-- Overrides for NuGet packages -->
-    <PropertyGroup Condition="'$(PackageType)' != '' OR '$(PackageId)' != '$(MSBuildProjectName)'">
+    <PropertyGroup Condition="'$(PackageType)' != '' OR '$(PackageId)' != ''">
         <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
 
