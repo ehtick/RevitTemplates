@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Build.Options;
 
@@ -20,7 +20,7 @@ public sealed record BuildOptions
     ///     1.0.0
     /// </example>
     public string? Version { get; init; }
-    
+
     /// <summary>
     ///     Path to build output
     /// </summary>

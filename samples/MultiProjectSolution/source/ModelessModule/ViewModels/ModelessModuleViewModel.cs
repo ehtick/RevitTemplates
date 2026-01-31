@@ -1,13 +1,14 @@
 ﻿using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
-using ModelessModule.Services;
+using ModelessModule.Messages;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using Nice3point.Revit.Toolkit.Options;
 
 namespace ModelessModule.ViewModels;
 
-public sealed partial class ModelessModuleViewModel(ModelessController modelessController, ILogger<ModelessModuleViewModel> logger) : ObservableObject
+public sealed partial class ModelessModuleViewModel(IMessenger messenger, ILogger<ModelessModuleViewModel> logger) : ObservableObject
 {
     private readonly ActionEventHandler _externalHandler = new();
     private readonly AsyncEventHandler _asyncExternalHandler = new();
@@ -34,30 +35,6 @@ public sealed partial class ModelessModuleViewModel(ModelessController modelessC
     }
 
     [RelayCommand]
-    private async Task SelectDelayedElementAsync()
-    {
-        Status = "Wait 2 second...";
-        await Task.Delay(TimeSpan.FromSeconds(2));
-
-        await _asyncExternalHandler.RaiseAsync(application =>
-        {
-            var selectionConfiguration = new SelectionConfiguration();
-            modelessController.Hide();
-
-            var reference = application.ActiveUIDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter);
-            var element = reference.ElementId.ToElement(application.ActiveUIDocument.Document)!;
-            modelessController.Show();
-
-            Element = element.Name;
-            Category = element.Category.Name;
-            
-            logger.LogInformation("Selection successful");
-        });
-
-        Status = string.Empty;
-    }
-
-    [RelayCommand]
     private async Task DeleteElementAsync()
     {
         var deletedId = await _asyncIdExternalHandler.RaiseAsync(application =>
@@ -77,5 +54,29 @@ public sealed partial class ModelessModuleViewModel(ModelessController modelessC
 
         TaskDialog.Show("Deleted element", $"ID: {deletedId}");
         logger.LogInformation("Deletion successful");
+    }
+    
+    [RelayCommand]
+    private async Task SelectDelayedElementAsync()
+    {
+        Status = "Wait 2 second...";
+        await Task.Delay(TimeSpan.FromSeconds(2));
+
+        await _asyncExternalHandler.RaiseAsync(application =>
+        {
+            messenger.Send(new SetWindowVisibilityMessage(false));
+
+            var selectionConfiguration = new SelectionConfiguration();
+            var reference = application.ActiveUIDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter);
+            var element = reference.ElementId.ToElement(application.ActiveUIDocument.Document)!;
+            
+            Element = element.Name;
+            Category = element.Category.Name;
+
+            logger.LogInformation("Selection successful");
+            messenger.Send(new SetWindowVisibilityMessage(true));
+        });
+
+        Status = string.Empty;
     }
 }

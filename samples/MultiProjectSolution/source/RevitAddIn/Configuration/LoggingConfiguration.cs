@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -19,16 +20,17 @@ namespace RevitAddIn.Config;
 /// }
 /// </code>
 /// </example>
-public static class LoggerConfigurator
+public static class LoggingConfiguration
 {
     private const string LogTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}";
 
-    public static void AddSerilogConfiguration(this ILoggingBuilder builder)
+    public static TBuilder AddSerilogLoggingProvider<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         var logger = CreateDefaultLogger();
-        builder.AddSerilog(logger);
+        builder.Logging.AddSerilog(logger);
 
         AppDomain.CurrentDomain.UnhandledException += OnOnUnhandledException;
+        return builder;
     }
 
     private static Logger CreateDefaultLogger()

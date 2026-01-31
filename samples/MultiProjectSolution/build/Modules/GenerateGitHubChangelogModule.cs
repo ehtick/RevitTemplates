@@ -1,3 +1,4 @@
+﻿using System.Text;
 using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.GitHub.Extensions;
@@ -12,12 +13,12 @@ namespace Build.Modules;
 [DependsOn<ResolveVersioningModule>]
 public sealed class GenerateGitHubChangelogModule : Module<string>
 {
-    protected override async Task<string?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task<string?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveVersioningModule>();
-        var changelogResult = await GetModule<GenerateChangelogModule>();
-        var versioning = versioningResult.Value!;
-        var changelog = changelogResult.Value!;
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var changelogResult = await context.GetModule<GenerateChangelogModule>();
+        var versioning = versioningResult.ValueOrDefault!;
+        var changelog = changelogResult.ValueOrDefault!;
 
         return AppendGitHubCompareUrl(context, changelog, versioning);
     }
@@ -27,11 +28,18 @@ public sealed class GenerateGitHubChangelogModule : Module<string>
     /// </summary>
     private static string AppendGitHubCompareUrl(IPipelineContext context, string changelog, ResolveVersioningResult versioning)
     {
-        if (changelog.Contains("Full changelog", StringComparison.OrdinalIgnoreCase)) return changelog;
-
         var repositoryInfo = context.GitHub().RepositoryInfo;
-        var url = $"https://github.com/{repositoryInfo.Identifier}/compare/{versioning.PreviousVersion}...{versioning.Version}";
+        StringBuilder? changelogBuilder = null;
 
-        return $"{changelog}{Environment.NewLine}{Environment.NewLine}**Full changelog**: {url}";
+        if (!changelog.Contains("Full changelog", StringComparison.OrdinalIgnoreCase))
+        {
+            changelogBuilder ??= new StringBuilder(changelog);
+            changelogBuilder.AppendLine()
+                .AppendLine()
+                .Append("**Full changelog**: ")
+                .AppendLine($"https://github.com/{repositoryInfo.Identifier}/compare/{versioning.PreviousVersion}...{versioning.Version}");
+        }
+
+        return changelogBuilder?.ToString() ?? changelog;
     }
 }

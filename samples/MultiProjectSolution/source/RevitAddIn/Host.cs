@@ -1,14 +1,13 @@
-using System.IO;
-using System.Reflection;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModalModule.ViewModels;
 using ModalModule.Views;
-using ModelessModule.Services;
 using ModelessModule.ViewModels;
 using ModelessModule.Views;
 using RevitAddIn.Config;
+using RevitAddIn.Configuration;
 
 namespace RevitAddIn;
 
@@ -26,23 +25,22 @@ public static class Host
     {
         var builder = new HostApplicationBuilder(new HostApplicationBuilderSettings
         {
-            ContentRootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
             DisableDefaults = true
         });
 
         //Logging
         builder.Logging.ClearProviders();
-        builder.Logging.AddSerilogConfiguration();
+        builder.AddSerilogLoggingProvider();
         
         //Configuration
-        builder.Services.AddSerializerOptions();
+        builder.ConfigureJsonSerializer();
 
         //Services
-        builder.Services.AddSingleton<ModelessController>();
         builder.Services.AddTransient<ModalModuleView>();
         builder.Services.AddTransient<ModalModuleViewModel>();
-        builder.Services.AddTransient<ModelessModuleView>();
-        builder.Services.AddTransient<ModelessModuleViewModel>();
+        builder.Services.AddSingleton<ModelessModuleView>();
+        builder.Services.AddSingleton<ModelessModuleViewModel>();
+        builder.Services.AddSingleton<IMessenger>(StrongReferenceMessenger.Default);
 
         _host = builder.Build();
         _host.Start();
