@@ -23,6 +23,13 @@ if (args.Length == 0)
 {
     builder.Services.AddModule<CompileProjectModule>();
 }
+#if (includeTests)
+
+if (args.Contains("test"))
+{
+    builder.Services.AddModule<TestProjectModule>();
+}
+#endif
 #if (hasArtifacts)
 
 if (args.Contains("pack"))

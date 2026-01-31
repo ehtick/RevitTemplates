@@ -64,6 +64,13 @@
       "description": "Autodesk App Store deployment bundle structure",
       "defaultValue": "false"
     },
+    "includeTests": {
+      "type": "parameter",
+      "displayName": "Testing support",
+      "datatype": "bool",
+      "description": "Unit testing solution configuration",
+      "defaultValue": "false"
+    },
     "isCiDisabled": {
       "type": "computed",
       "value": "ciProvider == \"Disabled\""
@@ -128,6 +135,13 @@
           "exclude": [
             "build/Modules/CreateBundleModule.cs",
             "build/Options/BundleOptions.cs"
+          ]
+        },
+        {
+          "condition": "!includeTests",
+          "exclude": [
+            "tests/**",
+            "build/Modules/TestProjectModule.cs"
           ]
         }
       ]
