@@ -1,3 +1,5 @@
-mode: ContinuousDeployment
-strategies:
-  - Mainline
+mode: ContinuousDelivery
+increment: Patch
+branches:
+  develop:
+    label: preview
