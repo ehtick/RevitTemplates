@@ -14,4 +14,8 @@
         <PackageReference Include="Polyfill" Version="9.7.6"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\source\ModelessModule\ModelessModule.csproj" />
+    </ItemGroup>
+
 </Project>

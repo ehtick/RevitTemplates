@@ -3,19 +3,20 @@ using Autodesk.Revit.UI.Selection;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using ModelessModule.Messages;
+using ModelessModule.Models;
+using ModelessModule.Services;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using Nice3point.Revit.Toolkit.Options;
 
 namespace ModelessModule.ViewModels;
 
-public sealed partial class ModelessModuleViewModel(IMessenger messenger, ILogger<ModelessModuleViewModel> logger) : ObservableObject
+public sealed partial class ModelessModuleViewModel(ElementMetadataExtractionService elementService, IMessenger messenger, ILogger<ModelessModuleViewModel> logger) : ObservableObject
 {
     private readonly ActionEventHandler _externalHandler = new();
     private readonly AsyncEventHandler _asyncExternalHandler = new();
     private readonly AsyncEventHandler<ElementId> _asyncIdExternalHandler = new();
 
-    [ObservableProperty] private string _element = string.Empty;
-    [ObservableProperty] private string _category = string.Empty;
+    [ObservableProperty] private ElementMetadata? _elementMetadata;
     [ObservableProperty] private string _status = string.Empty;
 
     [RelayCommand]
@@ -27,9 +28,8 @@ public sealed partial class ModelessModuleViewModel(IMessenger messenger, ILogge
             var reference = application.ActiveUIDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter);
             var element = reference.ElementId.ToElement(application.ActiveUIDocument.Document)!;
 
-            Element = element.Name;
-            Category = element.Category.Name;
-            
+            ElementMetadata = elementService.ExtractMetadata(element);
+
             logger.LogInformation("Selection successful");
         });
     }
@@ -55,7 +55,7 @@ public sealed partial class ModelessModuleViewModel(IMessenger messenger, ILogge
         TaskDialog.Show("Deleted element", $"ID: {deletedId}");
         logger.LogInformation("Deletion successful");
     }
-    
+
     [RelayCommand]
     private async Task SelectDelayedElementAsync()
     {
@@ -69,9 +69,8 @@ public sealed partial class ModelessModuleViewModel(IMessenger messenger, ILogge
             var selectionConfiguration = new SelectionConfiguration();
             var reference = application.ActiveUIDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter);
             var element = reference.ElementId.ToElement(application.ActiveUIDocument.Document)!;
-            
-            Element = element.Name;
-            Category = element.Category.Name;
+
+            ElementMetadata = elementService.ExtractMetadata(element);
 
             logger.LogInformation("Selection successful");
             messenger.Send(new SetWindowVisibilityMessage(true));
