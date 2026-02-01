@@ -33,7 +33,8 @@ public sealed class PackTemplatesModule(IOptions<BuildOptions> buildOptions) : M
         var versioning = versioningResult.ValueOrDefault!;
         var changelog = changelogResult?.ValueOrDefault ?? string.Empty;
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
-
+        var targetProject = new File(Projects.Nice3point_Revit_Templates.FullName);
+        
         List<string> updatedFiles = [];
 
         try
@@ -41,7 +42,7 @@ public sealed class PackTemplatesModule(IOptions<BuildOptions> buildOptions) : M
             updatedFiles = await SetSdkVersionAsync(versioning.Version, cancellationToken);
             await context.DotNet().Pack(new DotNetPackOptions
             {
-                ProjectSolution = Projects.Nice3point_Revit_Templates.FullName,
+                ProjectSolution = targetProject.Path,
                 Configuration = "Release",
                 Properties = new List<KeyValue>
                 {
@@ -51,6 +52,8 @@ public sealed class PackTemplatesModule(IOptions<BuildOptions> buildOptions) : M
                 },
                 Output = outputFolder
             }, cancellationToken: cancellationToken);
+
+            context.Summary.KeyValue("Artifacts", "Templates", outputFolder.FindFile(file => file.Name.StartsWith(targetProject.NameWithoutExtension))!.Path);
         }
         finally
         {

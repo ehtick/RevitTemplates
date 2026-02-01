@@ -1,35 +1,36 @@
 using Build.Options;
-using Microsoft.Extensions.Hosting;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
 using ModularPipelines.Git.Options;
 using ModularPipelines.Modules;
 using ModularPipelines.Options;
-using Shouldly;
 
 namespace Build.Modules;
 
 /// <summary>
 ///     Resolve semantic versions for compiling and publishing the templates.
 /// </summary>
-public sealed class ResolveVersioningModule(IOptions<PublishOptions> publishOptions, IHostEnvironment environment) : Module<ResolveVersioningResult>
+public sealed class ResolveVersioningModule(IOptions<PublishOptions> publishOptions) : Module<ResolveVersioningResult>
 {
     protected override async Task<ResolveVersioningResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var version = publishOptions.Value.Version;
-        if (environment.IsProduction())
+        var versioning = string.IsNullOrEmpty(version) switch
         {
-            version.ShouldNotBeNullOrWhiteSpace();
-        }
+            true => await CreateFromGitVersioningAsync(context),
+            false => await CreateFromVersionStringAsync(context, version)
+        };
 
-        return await CreateFromVersionStringAsync(context, version);
+        context.Summary.KeyValue("Build", "Version", versioning.Version);
+        return versioning;
     }
 
     /// <summary>
     ///     Resolve versions using the specified version string.
     /// </summary>
-    private static async Task<ResolveVersioningResult> CreateFromVersionStringAsync(IPipelineContext context, string version)
+    private static async Task<ResolveVersioningResult> CreateFromVersionStringAsync(IModuleContext context, string version)
     {
         var versionParts = version.Split('-');
 
@@ -44,16 +45,33 @@ public sealed class ResolveVersioningModule(IOptions<PublishOptions> publishOpti
     }
 
     /// <summary>
+    ///     Resolve versions using the GitVersion Tool.
+    /// </summary>
+    private static async Task<ResolveVersioningResult> CreateFromGitVersioningAsync(IModuleContext context)
+    {
+        var gitVersioning = await context.Git().Versioning.GetGitVersioningInformation();
+
+        return new ResolveVersioningResult
+        {
+            Version = gitVersioning.SemVer!,
+            VersionPrefix = gitVersioning.MajorMinorPatch!,
+            VersionSuffix = gitVersioning.PreReleaseTag,
+            IsPrerelease = !string.IsNullOrEmpty(gitVersioning.PreReleaseLabel),
+            PreviousVersion = await FetchPreviousVersionAsync(context)
+        };
+    }
+
+    /// <summary>
     ///     Retrieves the previous version from the git history.
     /// </summary>
-    private static async Task<string> FetchPreviousVersionAsync(IPipelineContext context)
+    private static async Task<string> FetchPreviousVersionAsync(IModuleContext context)
     {
         var describeResult = await context.Git().Commands.Describe(
             new GitDescribeOptions
             {
                 Tags = true,
                 Abbrev = "0",
-                Arguments = ["HEAD^"]
+                Arguments = ["HEAD^"],
             },
             new CommandExecutionOptions
             {
@@ -82,6 +100,7 @@ public sealed class ResolveVersioningModule(IOptions<PublishOptions> publishOpti
     }
 }
 
+[PublicAPI]
 public sealed record ResolveVersioningResult
 {
     /// <summary>
@@ -89,9 +108,9 @@ public sealed record ResolveVersioningResult
     /// </summary>
     /// <remarks>Version format: <c>version-environment.n.date</c>.</remarks>
     /// <example>
-    ///     1.0.0-alpha.1.250101 <br/>
-    ///     1.0.0-beta.2.250101 <br/>
-    ///     1.0.0
+    ///     1.0.0-alpha.1 <br/>
+    ///     12.3.6-rc.2.250101 <br/>
+    ///     2026.4.0
     /// </example>
     public required string Version { get; init; }
 

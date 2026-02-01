@@ -61,6 +61,11 @@ public sealed class CreateInstallerModule : Module
                     {"PATH", $"{Environment.GetEnvironmentVariable("PATH")};{wixToolFolder}"}
                 }
             }, cancellationToken: cancellationToken);
+
+        foreach (var outputFile in outputFolder.GetFiles(file => file.Extension == ".msi"))
+        {
+            context.Summary.KeyValue("Artifacts", "Installer", outputFile.Path);
+        }
     }
 
     /// <summary>

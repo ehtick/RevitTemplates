@@ -61,6 +61,8 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
                 await context.GitHub().Client.Repository.Release.UploadAsset(release, asset, cancellationToken);
             }, cancellationToken)
             .ProcessOneAtATime();
+
+        context.Summary.KeyValue("Deployment", "GitHub", release.HtmlUrl);
     }
 
     protected override async Task OnFailedAsync(IModuleContext context, Exception exception, CancellationToken cancellationToken)

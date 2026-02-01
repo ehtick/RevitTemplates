@@ -8,6 +8,7 @@ using ModularPipelines.Git.Extensions;
 using ModularPipelines.Models;
 using ModularPipelines.Modules;
 using Sourcy.DotNet;
+using File = ModularPipelines.FileSystem.File;
 
 namespace Build.Modules;
 
@@ -31,10 +32,11 @@ public sealed class PackSdkModule(IOptions<BuildOptions> buildOptions) : Module
         var versioning = versioningResult.ValueOrDefault!;
         var changelog = changelogResult?.ValueOrDefault ?? string.Empty;
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
+        var targetProject = new File(Projects.Nice3point_Revit_Sdk.FullName);
 
         await context.DotNet().Pack(new DotNetPackOptions
         {
-            ProjectSolution = Projects.Nice3point_Revit_Sdk.FullName,
+            ProjectSolution = targetProject.Path,
             Configuration = "Release",
             Output = outputFolder,
             Properties = new List<KeyValue>
@@ -44,5 +46,7 @@ public sealed class PackSdkModule(IOptions<BuildOptions> buildOptions) : Module
                 ("PackageReleaseNotes", changelog)
             }
         }, cancellationToken: cancellationToken);
+
+        context.Summary.KeyValue("Artifacts", "Sdk", outputFolder.FindFile(file => file.Name.StartsWith(targetProject.NameWithoutExtension))!.Path);
     }
 }

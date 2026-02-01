@@ -3,5 +3,5 @@
 [Serializable]
 public sealed record PublishOptions
 {
-    public string Version { get; init; } = string.Empty;
+    public string? Version { get; init; }
 }

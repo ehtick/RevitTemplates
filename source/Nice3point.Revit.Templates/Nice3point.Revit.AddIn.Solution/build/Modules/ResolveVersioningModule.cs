@@ -16,13 +16,15 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
 {
     protected override async Task<ResolveVersioningResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var version = buildOptions.Value.Version;
-        if (!string.IsNullOrEmpty(version))
+        var version = publishOptions.Value.Version;
+        var versioning = string.IsNullOrEmpty(version) switch
         {
-            return await CreateFromVersionStringAsync(context, version);
-        }
+            true => await CreateFromGitVersioningAsync(context),
+            false => await CreateFromVersionStringAsync(context, version)
+        };
 
-        return await CreateFromGitVersioningAsync(context);
+        context.Summary.KeyValue("Build", "Version", versioning.Version);
+        return versioning;
     }
 
     /// <summary>
@@ -69,7 +71,7 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
             {
                 Tags = true,
                 Abbrev = "0",
-                Arguments = ["HEAD^"],
+                Arguments = ["HEAD^"]
             },
             new CommandExecutionOptions
             {
@@ -87,7 +89,7 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
                 MaxCount = "1",
                 Pretty = "format:%H",
                 Arguments = ["HEAD"],
-                NoCommitHeader = true,
+                NoCommitHeader = true
             },
             new CommandExecutionOptions
             {

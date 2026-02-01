@@ -76,8 +76,10 @@ public sealed class PublishGithubModule : Module
             }, cancellationToken)
             .ProcessInParallel();
 #else
-        await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
+        var release = await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
 #endif
+
+        context.Summary.KeyValue("Deployment", "GitHub", release.HtmlUrl);
     }
 
     protected override async Task OnFailedAsync(IModuleContext context, Exception exception, CancellationToken cancellationToken)
