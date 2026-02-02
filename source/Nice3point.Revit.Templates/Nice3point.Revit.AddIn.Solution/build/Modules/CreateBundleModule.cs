@@ -26,7 +26,7 @@ public sealed partial class CreateBundleModule(IOptions<BuildOptions> buildOptio
         var versioningResult = await context.GetModule<ResolveVersioningModule>();
         var versioning = versioningResult.ValueOrDefault!;
 
-        var bundleTarget = new File(Projects.Nice3point.Revit.AddIn.FullName);
+        var bundleTarget = new File(Projects.Nice3point_Revit_AddIn__1.FullName);
         var targetDirectories = bundleTarget.Folder!
             .GetFolder("bin")
             .GetFolders(folder => folder.Name == "publish")

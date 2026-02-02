@@ -1,4 +1,4 @@
-# Nice3point.Revit.AddIn
+# Nice3point.Revit.AddIn.1
 
 Autodesk Revit plugin project organized into multiple solution files that target versions 2022 - 2026.
 

@@ -3,8 +3,8 @@ using WixSharp;
 using WixSharp.CommonTasks;
 using WixSharp.Controls;
 
-const string outputName = "Nice3point.Revit.AddIn";
-const string projectName = "Nice3point.Revit.AddIn";
+const string outputName = "Nice3point.Revit.AddIn.1";
+const string projectName = "Nice3point.Revit.AddIn.1";
 
 var versioning = Versioning.CreateFromVersionStringAsync(args[0]);
 var project = new Project

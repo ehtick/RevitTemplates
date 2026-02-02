@@ -1,8 +1,8 @@
-﻿using Nice3point.TUnit.Revit;
+using Nice3point.TUnit.Revit;
 using Nice3point.TUnit.Revit.Executors;
 using TUnit.Core.Executors;
 
-namespace Nice3point.Unit.Revit;
+namespace Nice3point.Unit.Revit._1;
 
 public sealed class RevitTests : RevitApiTest
 {

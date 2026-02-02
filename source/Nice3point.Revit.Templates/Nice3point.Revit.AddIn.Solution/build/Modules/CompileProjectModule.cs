@@ -38,7 +38,7 @@ public sealed class CompileProjectModule : Module
     {
         await context.DotNet().Build(new DotNetBuildOptions
         {
-            ProjectSolution = Solutions.Nice3point.Revit.AddIn.FullName,
+            ProjectSolution = Solutions.Nice3point_Revit_AddIn__1.FullName,
             Configuration = configuration,
             Properties =
             [

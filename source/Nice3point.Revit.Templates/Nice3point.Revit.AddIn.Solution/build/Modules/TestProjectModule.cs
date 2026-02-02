@@ -35,7 +35,7 @@ public sealed class TestProjectModule : Module
     {
         return await context.DotNet().Test(new DotNetTestOptions
         {
-            Solution = Solutions.Nice3point.Revit.AddIn.FullName,
+            Solution = Solutions.Nice3point_Revit_AddIn__1.FullName,
             Configuration = configuration
         }, cancellationToken: cancellationToken);
     }

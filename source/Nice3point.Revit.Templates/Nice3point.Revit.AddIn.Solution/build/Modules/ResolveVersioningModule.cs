@@ -16,7 +16,7 @@ public sealed class ResolveVersioningModule(IOptions<BuildOptions> buildOptions)
 {
     protected override async Task<ResolveVersioningResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var version = publishOptions.Value.Version;
+        var version = buildOptions.Value.Version;
         var versioning = string.IsNullOrEmpty(version) switch
         {
             true => await CreateFromGitVersioningAsync(context),

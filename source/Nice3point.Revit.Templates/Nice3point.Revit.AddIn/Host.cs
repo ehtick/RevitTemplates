@@ -10,14 +10,14 @@ using Microsoft.Extensions.Logging;
 #endif
 using Microsoft.Extensions.DependencyInjection;
 #if (useUi)
-using Nice3point.Revit.AddIn.Views;
-using Nice3point.Revit.AddIn.ViewModels;
+using Nice3point.Revit.AddIn._1.Views;
+using Nice3point.Revit.AddIn._1.ViewModels;
 #endif
 #if (diHosting || addinLogging)
-using Nice3point.Revit.AddIn.Configuration;
+using Nice3point.Revit.AddIn._1.Configuration;
 #endif
 
-namespace Nice3point.Revit.AddIn;
+namespace Nice3point.Revit.AddIn._1;
 
 /// <summary>
 ///     Provides a host for the application's services and manages their lifetimes
@@ -46,8 +46,8 @@ public static class Host
 #if (useUi)
 
         //MVVM
-        services.AddTransient<Nice3point.Revit.AddInViewModel>();
-        services.AddTransient<Nice3point.Revit.AddInView>();
+        services.AddTransient<Nice3point_Revit_AddIn__1ViewModel>();
+        services.AddTransient<Nice3point_Revit_AddIn__1View>();
 #endif
 
         _serviceProvider = services.BuildServiceProvider();
@@ -70,8 +70,8 @@ public static class Host
 #if (useUi)
 
         //MVVM
-        builder.Services.AddTransient<Nice3point.Revit.AddInViewModel>();
-        builder.Services.AddTransient<Nice3point.Revit.AddInView>();
+        builder.Services.AddTransient<Nice3point_Revit_AddIn__1ViewModel>();
+        builder.Services.AddTransient<Nice3point_Revit_AddIn__1View>();
 #endif
 
         _host = builder.Build();

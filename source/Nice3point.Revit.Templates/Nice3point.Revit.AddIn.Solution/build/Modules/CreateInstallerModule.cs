@@ -1,4 +1,6 @@
-﻿using ModularPipelines.Attributes;
+﻿using Build.Options;
+using Microsoft.Extensions.Options;
+using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.DotNet.Extensions;
 using ModularPipelines.DotNet.Options;
@@ -17,14 +19,14 @@ namespace Build.Modules;
 /// </summary>
 [DependsOn<ResolveVersioningModule>]
 [DependsOn<CompileProjectModule>]
-public sealed class CreateInstallerModule : Module
+public sealed class CreateInstallerModule(IOptions<BuildOptions> buildOptions) : Module
 {
     protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var versioningResult = await context.GetModule<ResolveVersioningModule>();
         var versioning = versioningResult.ValueOrDefault!;
 
-        var wixTarget = new File(Projects.Nice3point.Revit.AddIn.FullName);
+        var wixTarget = new File(Projects.Nice3point_Revit_AddIn__1.FullName);
         var wixInstaller = new File(Projects.Installer.FullName);
         var wixToolFolder = await InstallWixAsync(context, cancellationToken);
 
@@ -62,6 +64,7 @@ public sealed class CreateInstallerModule : Module
                 }
             }, cancellationToken: cancellationToken);
 
+        var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
         foreach (var outputFile in outputFolder.GetFiles(file => file.Extension == ".msi"))
         {
             context.Summary.KeyValue("Artifacts", "Installer", outputFile.Path);
