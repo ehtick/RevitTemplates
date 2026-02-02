@@ -16,7 +16,6 @@ namespace Build.Modules;
 /// <summary>
 ///     Pack the templates NuGet package.
 /// </summary>
-[DependsOn<CleanProjectsModule>]
 [DependsOn<ResolveVersioningModule>]
 [DependsOn<UpdateTemplatesReadmeModule>(Optional = true)]
 [DependsOn<CleanProjectsModule>(Optional = true)]

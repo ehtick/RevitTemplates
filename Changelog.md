@@ -2,20 +2,16 @@
 
 ## SDK
 
-- Upgraded target frameworks to .NET 10.0. Added support for the latest .NET version in project configurations and build tasks.
-- Improved targets execution sequence to avoid conflicts with Microsoft.NET.Sdk.
-- Updated `Sourcy.DotNet` to 1.1.1.
-- Updated `JetBrains.Annotations` to 2025.2.4.
-- Updated `Polyfill` to 9.8.0.
-- Updated `JetBrains.Annotations` to 2025.2.4.
+- Upgraded target frameworks to .NET 10.0.
+- Fixed targets execution sequence to avoid conflicts with Microsoft.NET.Sdk.
 
 ## Templates
 
 - Migrated build system to `ModularPipelines` v3. This major upgrade has a lot of improvements, better summary output, and refactored module logic.
 - Added support for semantic version handling in the Installer.
-- Enhanced Installer with support a new Revit 2027 installation path.
-- Integrated testing configuration into templates. New projects now include a pre-configured `tests` folder and environment https://github.com/Nice3point/RevitTemplates/issues/118.
+- Added support for solution testing configuration https://github.com/Nice3point/RevitTemplates/issues/118.
 - Added support for template name forms, allowing illegal characters for project name https://github.com/Nice3point/RevitTemplates/issues/117.
+- Enhanced Installer with support a new Revit 2027 installation path.
 - Added `JetBrains.Annotations` package references to solution templates with private assets.
 - Updated `ModularPipelines` to 3.1.6.
 - Updated `TUnit` to 1.12.111.
