@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Nice3point.Revit.AddIn.Configuration;
+namespace Nice3point.Revit.AddIn._1.Configuration;
 
 /// <summary>
 ///     Application hosting configuration.

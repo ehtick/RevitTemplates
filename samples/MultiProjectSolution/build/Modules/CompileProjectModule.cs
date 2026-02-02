@@ -1,8 +1,7 @@
-using ModularPipelines.Attributes;
+﻿using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.DotNet.Extensions;
 using ModularPipelines.DotNet.Options;
-using ModularPipelines.Models;
 using ModularPipelines.Modules;
 using Sourcy.DotNet;
 
@@ -15,31 +14,29 @@ namespace Build.Modules;
 [DependsOn<ResolveConfigurationsModule>]
 public sealed class CompileProjectModule : Module
 {
-    protected override async Task<IDictionary<string, object>?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveVersioningModule>();
-        var configurationsResult = await GetModule<ResolveConfigurationsModule>();
-        var versioning = versioningResult.Value!;
-        var configurations = configurationsResult.Value!;
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var configurationsResult = await context.GetModule<ResolveConfigurationsModule>();
+        var versioning = versioningResult.ValueOrDefault!;
+        var configurations = configurationsResult.ValueOrDefault!;
 
         foreach (var configuration in configurations)
         {
-            await SubModule(configuration, async () => await CompileAsync(context, versioning, configuration, cancellationToken));
+            await context.SubModule(configuration, async () => await CompileAsync(context, versioning, configuration, cancellationToken));
         }
-
-        return await NothingAsync();
     }
 
     /// <summary>
     ///     Compile the add-in project for the specified configuration.
     /// </summary>
-    private static async Task<CommandResult> CompileAsync(
-        IPipelineContext context,
+    private static async Task CompileAsync(
+        IModuleContext context,
         ResolveVersioningResult versioning,
         string configuration,
         CancellationToken cancellationToken)
     {
-        return await context.DotNet().Build(new DotNetBuildOptions
+        await context.DotNet().Build(new DotNetBuildOptions
         {
             ProjectSolution = Solutions.MultiProjectSolution.FullName,
             Configuration = configuration,
@@ -48,6 +45,6 @@ public sealed class CompileProjectModule : Module
                 ("VersionPrefix", versioning.VersionPrefix),
                 ("VersionSuffix", versioning.VersionSuffix!)
             ]
-        }, cancellationToken);
+        }, cancellationToken: cancellationToken);
     }
 }

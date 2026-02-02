@@ -5,7 +5,7 @@
   "shortName": "revit-addin",
   "identity": "Nice3point.Revit.AddIn",
   "defaultName": "RevitAddIn",
-  "sourceName": "Nice3point.Revit.AddIn",
+  "sourceName": "Nice3point.Revit.AddIn.1",
   "description": "Template for creating single-project Revit add-in",
   "classifications": [
     "Revit",

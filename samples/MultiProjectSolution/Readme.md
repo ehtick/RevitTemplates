@@ -9,16 +9,16 @@ Autodesk Revit plugin project organized into multiple solution files that target
 * [Solution Structure](#solution-structure)
 * [Project Structure](#project-structure)
 * [Building](#building)
-    * [Building the MSI installer and the Autodesk bundle on local machine](#building-the-msi-installer-and-the-autodesk-bundle-on-local-machine)
+  * [Building the MSI installer and the Autodesk bundle on local machine](#building-the-msi-installer-and-the-autodesk-bundle-on-local-machine)
 * [Publishing Releases](#publishing-releases)
-    * [Creating a new Release from the JetBrains Rider](#creating-a-new-release-from-the-jetbrains-rider)
-    * [Creating a new Release from the Terminal](#creating-a-new-release-from-the-terminal)
-    * [Creating a new Release on GitHub](#creating-a-new-release-on-github)
+  * [Creating a new Release from the JetBrains Rider](#creating-a-new-release-from-the-jetbrains-rider)
+  * [Creating a new Release from the Terminal](#creating-a-new-release-from-the-terminal)
+  * [Creating a new Release on GitHub](#creating-a-new-release-on-github)
 * [Compiling a solution on GitHub](#compiling-a-solution-on-github)
 * [Conditional compilation for a specific Revit version](#conditional-compilation-for-a-specific-revit-version)
 * [Managing Supported Revit Versions](#managing-supported-revit-versions)
-    * [Solution configurations](#solution-configurations)
-    * [Project configurations](#project-configurations)
+  * [Solution configurations](#solution-configurations)
+  * [Project configurations](#project-configurations)
 * [API references](#api-references)
 * [Learn More](#learn-more)
 <!-- TOC -->
@@ -36,7 +36,7 @@ If you haven't already installed these, you can do so by visiting the following:
 
 | Folder  | Description                                                                |
 |---------|----------------------------------------------------------------------------|
-| build   | ModularPipelines build system. Used to automate project builds         |
+| build   | ModularPipelines build system. Used to automate project builds             |
 | install | Add-in installer, called implicitly by the ModularPipelines build          |
 | source  | Project source code folder. Contains all solution projects                 |
 | output  | Folder of generated files by the build system, such as bundles, installers |
@@ -96,6 +96,11 @@ To execute your ModularPipelines build locally, you can follow these steps:
 Releases are managed by creating new [Git tags](https://git-scm.com/book/en/v2/Git-Basics-Tagging).
 A tag in Git used to capture a snapshot of the project at a particular point in time, with the ability to roll back to a previous version.
 
+The build system uses [GitVersion.Tool](https://gitversion.net/docs/) to automatically determine the Release version based on the Git history and tags. 
+If a tag is present on the current commit, the version will match the tag. If no tag is specified, the tool automatically generates a release version based on the branch name and commit history.
+
+You can also specify a fixed version by setting the `Version` property in the `build/appsettings.json` file. This will override the version determined by GitVersion.Tool.
+
 Tags can follow the format `version` or `version-stage.n.date` for pre-releases, where:
 
 - **version** specifies the version of the release:
@@ -122,7 +127,8 @@ For example:
 
 ### Updating the Changelog
 
-Updating the changelog is optional. If you provide a changelog, the build system will use it for the release notes. If no entry is found for the current version, GitHub will automatically generate release notes based on your pull requests and commits.
+Updating the changelog is optional. If you provide a changelog, the build system will use it for the release notes. 
+If no entry is found for the current version, GitHub will automatically generate release notes based on your pull requests and commits.
 
 To update the changelog manually:
 
@@ -180,12 +186,11 @@ To create releases directly on GitHub:
 4. (Optional) Specify the release version. If not specified, the system will automatically determine the version based on your Git history.
 5. Click **Run**.
 
-   ![image](https://github.com/user-attachments/assets/088388c1-6055-4d21-8d22-70f047d8f104)
-
+    ![image](https://github.com/user-attachments/assets/088388c1-6055-4d21-8d22-70f047d8f104)
 
 ## Compiling a solution on GitHub
 
-Pushing commits to the remote repository will start a pipeline compiling the solution for all specified Revit versions.
+Pushing commits to the remote repository will start a pipeline compiling the solution for all specified Revit versions. 
 That way, you can check if the plugin is compatible with different API versions without having to spend time building it locally.
 
 ## Conditional compilation for a specific Revit version
@@ -201,12 +206,12 @@ To write code compatible with different Revit versions, use the directives **#if
 To target a specific Revit version, set the solution configuration in your IDE interface to match that version.
 E.g., select the `Debug.R26` configuration for the Revit 2026 API.
 
-The project has available constants such as `REVIT2026`, `REVIT2026_OR_GREATER`, `REVIT2026_OR_GREATER`.
+The project has available constants such as `REVIT2026`, `REVIT2026_OR_GREATER`. 
 Create conditions, experiment to achieve the desired result.
 
 > [!NOTE]  
-> For generating directives, a third-party package is used.
-> You can find more detailed documentation about it here: [Revit.Build.Tasks](https://github.com/Nice3point/Revit.Build.Tasks)
+> For generating directives, a Revit MSBuild SDK is used.
+> You can find more detailed documentation about it here: [Revit MSBuild SDK](https://github.com/Nice3point/Revit.Build.Tasks)
 
 To support the latest APIs in legacy Revit versions:
 
@@ -257,7 +262,7 @@ EndGlobalSection
 
 For example `Debug.R26` is the Debug configuration for Revit 2026 version.
 
-> [!TIP]
+> [!TIP]  
 > If you are just ending maintenance for some version, removing the Solution configurations without modifying the Project configurations is enough.
 
 ### Project configurations
@@ -279,12 +284,6 @@ Example:
 
 > [!IMPORTANT]  
 > Edit the `.csproj` file only manually, IDEs often break configurations.
-
-Then simply map the solution configuration to the project configuration:
-
-![image](https://github.com/user-attachments/assets/9f357ded-d38c-4f0a-a21f-152de75f4abc)
-
-Solution and project configuration names may differ, this example uses the same naming style to avoid confusion.
 
 Revit MSBuild SDK automatically sets the required `TargetFramework` based on the `RevitVersion`, extracted from the solution configuration name. 
 
@@ -315,4 +314,4 @@ configuration.
 
 ## Learn More
 
-* You can explore more in the [RevitTemplates Wiki](https://github.com/Nice3point/RevitTemplates/wiki) page.
+* You can explore more on the [RevitTemplates Wiki](https://github.com/Nice3point/RevitTemplates/wiki) page.

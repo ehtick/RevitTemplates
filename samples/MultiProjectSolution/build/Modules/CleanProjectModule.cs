@@ -1,6 +1,7 @@
-﻿using Build.Attributes;
-using Build.Options;
+﻿using Build.Options;
 using Microsoft.Extensions.Options;
+using ModularPipelines.Attributes;
+using ModularPipelines.Conditions;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
 using ModularPipelines.Modules;
@@ -11,15 +12,13 @@ namespace Build.Modules;
 /// <summary>
 ///     Clean projects and artifact directories.
 /// </summary>
-[SkipIfContinuousIntegrationBuild]
-public sealed class CleanProjectModule(IOptions<BuildOptions> buildOptions) : Module
+[SkipIf<IsCI>]
+public sealed class CleanProjectModule(IOptions<BuildOptions> buildOptions) : SyncModule
 {
-    protected override async Task<IDictionary<string, object>?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override void ExecuteModule(IModuleContext context, CancellationToken cancellationToken)
     {
         var rootDirectory = context.Git().RootDirectory;
-
         var outputDirectory = rootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
-
         var buildOutputDirectories = rootDirectory
             .GetFolders(folder => folder.Name is "bin" or "obj")
             .Where(folder => folder.Parent != Projects.Build.Directory);
@@ -33,7 +32,5 @@ public sealed class CleanProjectModule(IOptions<BuildOptions> buildOptions) : Mo
         {
             outputDirectory.Clean();
         }
-
-        return await NothingAsync();
     }
 }

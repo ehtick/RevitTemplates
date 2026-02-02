@@ -8,10 +8,10 @@ using Microsoft.Extensions.Logging;
 #endif
 using Microsoft.Extensions.DependencyInjection;
 #if (diHosting || addinLogging)
-using Nice3point.Revit.AddIn.Configuration;
+using Nice3point.Revit.AddIn._1.Configuration;
 #endif
 
-namespace Nice3point.Revit.AddIn;
+namespace Nice3point.Revit.AddIn._1;
 
 /// <summary>
 ///     Provides a host for the application's services and manages their lifetimes

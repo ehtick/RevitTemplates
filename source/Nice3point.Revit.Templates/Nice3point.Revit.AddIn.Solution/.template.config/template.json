@@ -5,7 +5,7 @@
   "shortName": "revit-addin-sln",
   "identity": "Nice3point.Revit.AddIn.Solution",
   "defaultName": "RevitAddIn",
-  "sourceName": "Nice3point.Revit.AddIn",
+  "sourceName": "Nice3point.Revit.AddIn.1",
   "description": "Template for creating a solution structure for Revit add-ins",
   "classifications": [
     "Revit",
@@ -64,6 +64,13 @@
       "description": "Autodesk App Store deployment bundle structure",
       "defaultValue": "false"
     },
+    "includeTests": {
+      "type": "parameter",
+      "displayName": "Testing support",
+      "datatype": "bool",
+      "description": "Unit testing solution configuration",
+      "defaultValue": "false"
+    },
     "isCiDisabled": {
       "type": "computed",
       "value": "ciProvider == \"Disabled\""
@@ -90,7 +97,7 @@
       "modifiers": [
         {
           "exclude": [
-            "Nice3point.Revit.AddIn.slnx"
+            "Nice3point.Revit.AddIn.1.slnx"
           ]
         },
         {
@@ -117,17 +124,6 @@
           ]
         },
         {
-          "condition": "isGitHubCi && !hasArtifacts",
-          "exclude": [
-            ".github/workflows/PublishRelease.yml",
-            "Changelog.md",
-            "build/Modules/GenerateChangelogModule.cs",
-            "build/Modules/GenerateGitHubChangelogModule.cs",
-            "build/Modules/PublishGithubModule.cs",
-            "build/Options/PublishOptions.cs"
-          ]
-        },
-        {
           "condition": "!includeInstaller",
           "exclude": [
             "install/**",
@@ -139,6 +135,13 @@
           "exclude": [
             "build/Modules/CreateBundleModule.cs",
             "build/Options/BundleOptions.cs"
+          ]
+        },
+        {
+          "condition": "!includeTests",
+          "exclude": [
+            "tests/**",
+            "build/Modules/TestProjectModule.cs"
           ]
         }
       ]

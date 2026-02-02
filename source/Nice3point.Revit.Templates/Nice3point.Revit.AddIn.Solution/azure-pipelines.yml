@@ -44,5 +44,5 @@ jobs:
 
       - task: PublishBuildArtifacts@1
         inputs:
-          ArtifactName: Nice3point.Revit.AddIn
+          ArtifactName: Nice3point.Revit.AddIn.1
           PathtoPublish: 'output'

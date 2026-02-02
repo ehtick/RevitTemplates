@@ -1,13 +1,13 @@
 ﻿using Nice3point.Revit.Toolkit.External;
 #if (isApplicationAddin)
-using Nice3point.Revit.AddIn.Commands;
+using Nice3point.Revit.AddIn._1.Commands;
 #endif
 #if (addinLogging && !useDi)
 using Serilog;
 using Serilog.Events;
 #endif
 
-namespace Nice3point.Revit.AddIn;
+namespace Nice3point.Revit.AddIn._1;
 
 /// <summary>
 ///     Application entry point
@@ -46,11 +46,11 @@ public class Application : ExternalDBApplication
 
     private void CreateRibbon()
     {
-        var panel = Application.CreatePanel("Commands", "Nice3point.Revit.AddIn");
+        var panel = Application.CreatePanel("Commands", "Nice3point.Revit.AddIn.1");
 
         panel.AddPushButton<StartupCommand>("Execute")
-            .SetImage("/Nice3point.Revit.AddIn;component/Resources/Icons/RibbonIcon16.png")
-            .SetLargeImage("/Nice3point.Revit.AddIn;component/Resources/Icons/RibbonIcon32.png");
+            .SetImage("/Nice3point.Revit.AddIn.1;component/Resources/Icons/RibbonIcon16.png")
+            .SetLargeImage("/Nice3point.Revit.AddIn.1;component/Resources/Icons/RibbonIcon32.png");
     }
 #endif
 #if (addinLogging && !useDi)

@@ -4,17 +4,17 @@ using Nice3point.Revit.Toolkit.External;
 using Autodesk.Revit.UI;
 #endif
 #if (useUi && !useDi)
-using Nice3point.Revit.AddIn.ViewModels;
+using Nice3point.Revit.AddIn._1.ViewModels;
 #endif
 #if (useUi)
-using Nice3point.Revit.AddIn.Views;
+using Nice3point.Revit.AddIn._1.Views;
 #endif
 #if (addinLogging && isCommandAddin && !useDi)
 using Serilog;
 using Serilog.Events;
 #endif
 
-namespace Nice3point.Revit.AddIn.Commands;
+namespace Nice3point.Revit.AddIn._1.Commands;
 
 /// <summary>
 ///     External command entry point.
@@ -32,16 +32,16 @@ public class StartupCommand : ExternalCommand
         var logger = CreateLogger();
 #endif
 #if (useUi && useDi)
-        var view = Host.GetService<Nice3point.Revit.AddInView>();
+        var view = Host.GetService<Nice3point_Revit_AddIn__1View>();
         view.ShowDialog();
 #elseif (!useUi && useDi)
-        TaskDialog.Show(Document.Title, "Nice3point.Revit.AddIn");
+        TaskDialog.Show(Document.Title, "Nice3point.Revit.AddIn.1");
 #elseif (useUi)
-        var viewModel = new Nice3point.Revit.AddInViewModel();
-        var view = new Nice3point.Revit.AddInView(viewModel);
+        var viewModel = new Nice3point_Revit_AddIn__1ViewModel();
+        var view = new Nice3point_Revit_AddIn__1View(viewModel);
         view.ShowDialog();
 #elseif (!useUi)
-        TaskDialog.Show(Document.Title, "Nice3point.Revit.AddIn");
+        TaskDialog.Show(Document.Title, "Nice3point.Revit.AddIn.1");
 #endif
     }
 #if (addinLogging && isCommandAddin && !useDi)

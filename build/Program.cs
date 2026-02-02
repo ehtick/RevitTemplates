@@ -2,46 +2,37 @@
 using Build.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ModularPipelines;
 using ModularPipelines.Extensions;
-using ModularPipelines.Host;
 
-await PipelineHostBuilder.Create()
-    .ConfigureAppConfiguration((context, builder) =>
-    {
-        builder.AddJsonFile("appsettings.json")
-            .AddCommandLine(args)
-            .AddEnvironmentVariables();
-    })
-    .ConfigureServices((context, collection) =>
-    {
-        collection.AddOptions<BuildOptions>().Bind(context.Configuration.GetSection("Build")).ValidateDataAnnotations();
+var builder = Pipeline.CreateBuilder();
 
-        collection.AddModule<ResolveVersioningModule>();
+builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration.AddUserSecrets<Program>();
+builder.Configuration.AddEnvironmentVariables();
+builder.Configuration.AddCommandLine(args);
 
-        if (args.Length == 0)
-        {
-            collection.AddModule<CompileProjectModule>();
-            return;
-        }
+builder.Services.Configure<BuildOptions>(builder.Configuration.GetSection("Build"));
+builder.Services.Configure<NuGetOptions>(builder.Configuration.GetSection("NuGet"));
+builder.Services.Configure<PublishOptions>(builder.Configuration.GetSection("Publish"));
 
-        if (args.Contains("pack"))
-        {
-            collection.AddModule<CleanProjectModule>();
-            collection.AddModule<PackSdkModule>();
-            collection.AddModule<PackTemplatesModule>();
-            collection.AddModule<GenerateChangelogModule>();
-            collection.AddModule<GenerateNugetChangelogModule>();
-            collection.AddModule<UpdateTemplatesReadmeModule>();
-            collection.AddModule<RestoreTemplatesReadmeModule>();
-        }
+if (args.Length == 0)
+{
+    builder.Services.AddModule<CompileProjectModule>();
+}
 
-        if (args.Contains("publish"))
-        {
-            collection.AddOptions<NuGetOptions>().Bind(context.Configuration.GetSection("NuGet")).ValidateDataAnnotations();
+if (args.Contains("pack"))
+{
+    builder.Services.AddModule<CleanProjectsModule>();
+    builder.Services.AddModule<PackSdkModule>();
+    builder.Services.AddModule<PackTemplatesModule>();
+    builder.Services.AddModule<RestoreReadmeModule>();
+}
 
-            collection.AddModule<GenerateGitHubChangelogModule>();
-            collection.AddModule<PublishNugetModule>();
-            collection.AddModule<PublishGithubModule>();
-        }
-    })
-    .ExecutePipelineAsync();
+if (args.Contains("publish"))
+{
+    builder.Services.AddModule<PublishNugetModule>();
+    builder.Services.AddModule<PublishGithubModule>();
+}
+
+await builder.Build().RunAsync();

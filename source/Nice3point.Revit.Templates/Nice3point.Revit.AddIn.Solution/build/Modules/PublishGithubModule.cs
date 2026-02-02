@@ -1,7 +1,9 @@
-﻿using Build.Options;
+﻿#if (hasArtifacts)
+using Build.Options;
 using EnumerableAsyncProcessor.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+#endif
 using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
@@ -10,8 +12,9 @@ using ModularPipelines.GitHub.Attributes;
 using ModularPipelines.GitHub.Extensions;
 using ModularPipelines.Modules;
 using Octokit;
+#if (hasArtifacts)
 using Shouldly;
-using Status = ModularPipelines.Enums.Status;
+#endif
 
 namespace Build.Modules;
 
@@ -22,23 +25,29 @@ namespace Build.Modules;
 [DependsOn<ResolveVersioningModule>]
 [DependsOn<GenerateGitHubChangelogModule>]
 #if (includeBundle)
-[DependsOn<CreateBundleModule>]
+[DependsOn<CreateBundleModule>(Optional = true)]
 #endif
 #if (includeInstaller)
-[DependsOn<CreateInstallerModule>]
+[DependsOn<CreateInstallerModule>(Optional = true)]
 #endif
-public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : Module<ReleaseAsset[]?>
+#if (hasArtifacts)
+public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : Module
+#else
+public sealed class PublishGithubModule : Module
+#endif
 {
-    protected override async Task<ReleaseAsset[]?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task ExecuteModuleAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveVersioningModule>();
-        var changelogResult = await GetModule<GenerateGitHubChangelogModule>();
-        var versioning = versioningResult.Value!;
-        var changelog = changelogResult.Value!;
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var changelogResult = await context.GetModule<GenerateGitHubChangelogModule>();
+        var versioning = versioningResult.ValueOrDefault!;
+        var changelog = changelogResult.ValueOrDefault!;
+#if (hasArtifacts)
 
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
         var targetFiles = outputFolder.ListFiles().ToArray();
         targetFiles.ShouldNotBeEmpty("No artifacts were found to create the Release");
+#endif
 
         var repositoryInfo = context.GitHub().RepositoryInfo;
         var newRelease = new NewRelease(versioning.Version)
@@ -49,9 +58,10 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
             Prerelease = versioning.IsPrerelease
         };
 
+#if (hasArtifacts)
         var release = await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
-        return await targetFiles
-            .SelectAsync(async file =>
+        await targetFiles
+            .ForEachAsync(async file =>
             {
                 var asset = new ReleaseAssetUpload
                 {
@@ -62,23 +72,25 @@ public sealed class PublishGithubModule(IOptions<BuildOptions> buildOptions) : M
 
                 context.Logger.LogInformation("Uploading asset: {Asset}", asset.FileName);
 
-                return await context.GitHub().Client.Repository.Release.UploadAsset(release, asset, cancellationToken);
+                await context.GitHub().Client.Repository.Release.UploadAsset(release, asset, cancellationToken);
             }, cancellationToken)
             .ProcessInParallel();
+#else
+        var release = await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
+#endif
+
+        context.Summary.KeyValue("Deployment", "GitHub", release.HtmlUrl);
     }
 
-    protected override async Task OnAfterExecute(IPipelineContext context)
+    protected override async Task OnFailedAsync(IModuleContext context, Exception exception, CancellationToken cancellationToken)
     {
-        if (Status == Status.Failed)
+        var versioningResult = await context.GetModule<ResolveVersioningModule>();
+        var versioning = versioningResult.ValueOrDefault!;
+
+        await context.Git().Commands.Push(new GitPushOptions
         {
-            var versioningResult = await GetModule<ResolveVersioningModule>();
-            var versioning = versioningResult.Value!;
-            
-            await context.Git().Commands.Push(new GitPushOptions
-            {
-                Delete = true,
-                Arguments = ["origin", versioning.Version]
-            });
-        }
+            Delete = true,
+            Arguments = ["origin", versioning.Version]
+        }, token: cancellationToken);
     }
 }

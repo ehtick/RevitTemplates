@@ -1,5 +1,5 @@
-﻿using Autodesk.Revit.Attributes;
-using ModelessModule.Services;
+using System.Windows;
+using Autodesk.Revit.Attributes;
 using ModelessModule.Views;
 using Nice3point.Revit.Toolkit.External;
 
@@ -14,8 +14,18 @@ public class ShowModelessWindowCommand : ExternalCommand
 {
     public override void Execute()
     {
-        var modelessController = Host.GetService<ModelessController>();
         var view = Host.GetService<ModelessModuleView>();
-        modelessController.Show(view);
+
+        if (view.WindowState == WindowState.Minimized)
+        {
+            view.WindowState = WindowState.Normal;
+        }
+
+        if (!view.IsVisible)
+        {
+            view.Show(Context.UiApplication.MainWindowHandle);
+        }
+
+        view.Focus();
     }
 }

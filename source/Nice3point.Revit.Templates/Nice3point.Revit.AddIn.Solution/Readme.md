@@ -1,4 +1,4 @@
-# Nice3point.Revit.AddIn
+# Nice3point.Revit.AddIn.1
 
 Autodesk Revit plugin project organized into multiple solution files that target versions 2022 - 2026.
 
@@ -16,7 +16,7 @@ Autodesk Revit plugin project organized into multiple solution files that target
 ---#elseif (includeBundle)
   * [Building the Autodesk bundle on local machine](#building-the-autodesk-bundle-on-local-machine)
 ---#endif
----#if (isReleaseCi && hasArtifacts)
+---#if (isReleaseCi)
 * [Publishing Releases](#publishing-releases)
   * [Creating a new Release from the JetBrains Rider](#creating-a-new-release-from-the-jetbrains-rider)
   * [Creating a new Release from the Terminal](#creating-a-new-release-from-the-terminal)
@@ -129,7 +129,7 @@ To execute your ModularPipelines build locally, you can follow these steps:
 ---#endif
    This command will execute the ModularPipelines build defined in your project.
 ---#endif
----#if (isReleaseCi && hasArtifacts)
+---#if (isReleaseCi)
 
 ## Publishing Releases
 
@@ -230,9 +230,9 @@ To create releases directly on GitHub:
 5. Click **Run**.
 
     ![image](https://github.com/user-attachments/assets/088388c1-6055-4d21-8d22-70f047d8f104)
-
 ---#endif
 ---#if (isAzureCi)
+
 ### Creating a new Release on Azure DevOps
 
 To create releases directly on Azure:
