@@ -24,7 +24,7 @@ public sealed class ResolveConfigurationsModule : Module<string[]>
         return configurations;
     }
 
-    private static async Task<SolutionModel> LoadSolutionModelAsync(IPipelineContext context, CancellationToken cancellationToken)
+    private static async Task<SolutionModel> LoadSolutionModelAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var solution = context.Git().RootDirectory.FindFile(file => file.Extension == ".slnx");
         if (solution is not null)
