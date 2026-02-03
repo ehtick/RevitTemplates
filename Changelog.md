@@ -1,3 +1,7 @@
+# 6.1.2
+
+- Fix bundle Contents folder name https://github.com/lookup-foundation/RevitLookup/pull/360
+
 # 6.1.1
 
 ## Templates
