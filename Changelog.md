@@ -1,3 +1,9 @@
+# 6.1.1
+
+## Templates
+
+- Fix missing `await using` statement in **Build** project. https://github.com/Nice3point/RevitTemplates/issues/134
+
 # 6.1.0
 
 ## SDK

@@ -74,12 +74,16 @@ Templates description: https://github.com/Nice3point/RevitTemplates/wiki/Templat
     - MVVM pattern implementation with modal and modeless windows
     - Dependency Injection implementation using Hosting
     - Logging
-    - **IOptions\<T\>** usages for serialization
-    - **IExternalEvents** usages for calling Revit API from async code
+    - Tests example
+    - Benchmarks example
+    - `IOptions\<T\>` usages for serialization
+    - `IExternalEvents` usages for calling Revit API from async code
 
-| Template                | Creation options                                  | Value                                  |
-|-------------------------|---------------------------------------------------|----------------------------------------|
-| Revit Solution          | Bundle support<br/>Installer support<br/>Pipeline | Enabled<br/>Enabled<br/>GitHub actions |
-| Revit AddIn Application | Serilog support<br/>AddIn type<br/>IoC            | Enabled<br/>Application<br/>Hosting    |
-| Revit AddIn Module      | Inject dependencies<br/>User interface            | Enabled<br/>Modal                      |
-| Revit AddIn Module      | Inject dependencies<br/>User interface            | Enabled<br/>Modeless                   |
+| Template                | Creation options                                                      | Value                                              |
+|-------------------------|-----------------------------------------------------------------------|----------------------------------------------------|
+| Revit Solution          | Bundle support<br/>Installer support<br/>Testing support<br/>Pipeline | Enabled<br/>Enabled<br/>Enabled<br/>GitHub actions |
+| Revit AddIn Application | Serilog support<br/>AddIn type<br/>IoC                                | Enabled<br/>Application<br/>Hosting                |
+| Revit AddIn Module      | Inject dependencies<br/>User interface                                | Enabled<br/>Modal                                  |
+| Revit AddIn Module      | Inject dependencies<br/>User interface                                | Enabled<br/>Modeless                               |
+| Revit Benchmarks        |                                                                       |                                                    |
+| Revit Test (TUnit)      |                                                                       |                                                    |
