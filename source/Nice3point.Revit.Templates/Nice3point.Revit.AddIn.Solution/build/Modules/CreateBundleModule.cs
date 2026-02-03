@@ -36,7 +36,7 @@ public sealed partial class CreateBundleModule(IOptions<BuildOptions> buildOptio
 
         var outputFolder = context.Git().RootDirectory.GetFolder(buildOptions.Value.OutputDirectory);
         var bundleFolder = outputFolder.CreateFolder($"{bundleTarget.NameWithoutExtension}.bundle");
-        var contentFolder = bundleFolder.CreateFolder("Content");
+        var contentFolder = bundleFolder.CreateFolder("Contents");
         var manifestFile = bundleFolder.GetFile("PackageContents.xml");
 
         PackFiles(targetDirectories, contentFolder);
